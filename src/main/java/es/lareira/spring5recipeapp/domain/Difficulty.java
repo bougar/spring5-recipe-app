@@ -1,6 +1,5 @@
 package es.lareira.spring5recipeapp.domain;
 
-public class Difficulty {
+public enum Difficulty {
     EASY, MODERATE, HARD
-
 }
