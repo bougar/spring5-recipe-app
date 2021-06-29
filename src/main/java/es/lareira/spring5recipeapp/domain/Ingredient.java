@@ -11,55 +11,62 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class Ingredient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String description;
-    private BigDecimal amount;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @OneToOne
-    private UnitOfMeasure unitOfMeasure;
+  private String description;
+  private BigDecimal amount;
 
-    @ManyToOne
-    private Recipe recipe;
+  @OneToOne private UnitOfMeasure unitOfMeasure;
 
-    public Long getId() {
-        return id;
-    }
+  @ManyToOne private Recipe recipe;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public Ingredient(
+      final String description, final BigDecimal amount, final UnitOfMeasure unitOfMeasure, final Recipe recipe) {
+    this.description = description;
+    this.amount = amount;
+    this.unitOfMeasure = unitOfMeasure;
+    this.recipe = recipe;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public Long getId() {
+    return this.id;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setId(final Long id) {
+    this.id = id;
+  }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
+  public String getDescription() {
+    return this.description;
+  }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
+  public void setDescription(final String description) {
+    this.description = description;
+  }
 
-    public UnitOfMeasure getUnitOfMeasure() {
-        return unitOfMeasure;
-    }
+  public BigDecimal getAmount() {
+    return this.amount;
+  }
 
-    public void setUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
-        this.unitOfMeasure = unitOfMeasure;
-    }
+  public void setAmount(final BigDecimal amount) {
+    this.amount = amount;
+  }
 
-    public Recipe getRecipe() {
-        return recipe;
-    }
+  public UnitOfMeasure getUnitOfMeasure() {
+    return this.unitOfMeasure;
+  }
 
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
-    }
+  public void setUnitOfMeasure(final UnitOfMeasure unitOfMeasure) {
+    this.unitOfMeasure = unitOfMeasure;
+  }
+
+  public Recipe getRecipe() {
+    return this.recipe;
+  }
+
+  public void setRecipe(final Recipe recipe) {
+    this.recipe = recipe;
+  }
 }
