@@ -17,6 +17,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import lombok.Data;
+
+@Data
 @Entity
 public class Recipe {
   @Id
@@ -48,106 +51,9 @@ public class Recipe {
       inverseJoinColumns = @JoinColumn(name = "category_id"))
   private Set<Category> categories = new HashSet<>();
 
-  public Long getId() {
-    return this.id;
-  }
-
-  public void setId(final Long id) {
-    this.id = id;
-  }
-
-  public String getDescription() {
-    return this.description;
-  }
-
-  public void setDescription(final String description) {
-    this.description = description;
-  }
-
-  public Integer getPreparationTime() {
-    return this.preparationTime;
-  }
-
-  public void setPreparationTime(final Integer preparationTime) {
-    this.preparationTime = preparationTime;
-  }
-
-  public Integer getCookingTime() {
-    return this.cookingTime;
-  }
-
-  public void setCookingTime(final Integer cookingTime) {
-    this.cookingTime = cookingTime;
-  }
-
-  public String getSource() {
-    return this.source;
-  }
-
-  public void setSource(final String source) {
-    this.source = source;
-  }
-
-  public String getUrl() {
-    return this.url;
-  }
-
-  public void setUrl(final String url) {
-    this.url = url;
-  }
-
-  public String getDirections() {
-    return this.directions;
-  }
-
-  public void setDirections(final String directions) {
-    this.directions = directions;
-  }
-
-  public Byte[] getImage() {
-    return this.image;
-  }
-
-  public void setImage(final Byte[] image) {
-    this.image = image;
-  }
-
-  public Notes getNotes() {
-    return this.notes;
-  }
-
-  public void setNotes(final Notes notes) {
-    notes.setRecipe(this);
-    this.notes = notes;
-  }
-
   public Recipe addIngredient(final Ingredient ingredient) {
     ingredient.setRecipe(this);
     this.ingredients.add(ingredient);
     return this;
-  }
-
-  public Difficulty getDifficulty() {
-    return this.difficulty;
-  }
-
-  public void setDifficulty(final Difficulty difficulty) {
-    this.difficulty = difficulty;
-  }
-
-  public Set<Ingredient> getIngredients() {
-    return this.ingredients;
-  }
-
-  public void setIngredients(final Set<Ingredient> ingredients) {
-    this.ingredients = ingredients;
-  }
-
-  public Set<Category> getCategories() {
-    return this.categories;
-  }
-
-  public void setCategories(final Set<Category> categories) {
-    this.categories = categories;
   }
 }

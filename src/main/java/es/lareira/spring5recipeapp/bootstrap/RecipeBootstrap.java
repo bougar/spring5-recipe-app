@@ -18,7 +18,9 @@ import es.lareira.spring5recipeapp.domain.UnitOfMeasure;
 import es.lareira.spring5recipeapp.repositories.CategoryRepository;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
 import es.lareira.spring5recipeapp.repositories.UnitOfMeasureRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 

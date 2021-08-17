@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.services.RecipeService;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@Slf4j
 public class IndexController {
   private final RecipeService recipeService;
 
