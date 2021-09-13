@@ -9,8 +9,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(exclude = {"recipes"})
 @Entity
 public class Category {
 
@@ -21,5 +23,5 @@ public class Category {
   private String description;
 
   @ManyToMany(mappedBy = "categories")
-  private Set<Recipe> recipe;
+  private Set<Recipe> recipes;
 }
