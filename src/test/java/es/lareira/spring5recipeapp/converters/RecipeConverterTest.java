@@ -15,7 +15,8 @@ class RecipeConverterTest {
 
   @Test
   void testToCommand() {
-    RecipeConverterImpl recipeConverterImpl = new RecipeConverterImpl();
+    RecipeConverterImpl recipeConverterImpl = new RecipeConverterImpl(
+        new IngredientConverterImpl(new UnitOfMeasureConverterImpl()), new NotesConverterImpl());
 
     Notes notes = new Notes();
     notes.setId(123L);
@@ -76,7 +77,8 @@ class RecipeConverterTest {
 
   @Test
   void testToDomain() {
-    RecipeConverterImpl recipeConverterImpl = new RecipeConverterImpl();
+    RecipeConverterImpl recipeConverterImpl = new RecipeConverterImpl(
+        new IngredientConverterImpl(new UnitOfMeasureConverterImpl()), new NotesConverterImpl());
 
     NotesCommand notesCommand = new NotesCommand();
     notesCommand.setId(123L);

@@ -4,6 +4,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import es.lareira.spring5recipeapp.converters.IngredientConverterImpl;
+import es.lareira.spring5recipeapp.converters.NotesConverterImpl;
+import es.lareira.spring5recipeapp.converters.RecipeConverterImpl;
+import es.lareira.spring5recipeapp.converters.UnitOfMeasureConverterImpl;
 import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
 import java.util.Collections;
@@ -26,7 +30,9 @@ class RecipeServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    this.recipeService = new RecipeServiceImpl(this.recipeRepository);
+    this.recipeService = new RecipeServiceImpl(this.recipeRepository,
+        new RecipeConverterImpl(new IngredientConverterImpl(new UnitOfMeasureConverterImpl()),
+            new NotesConverterImpl()));
   }
 
   @Test

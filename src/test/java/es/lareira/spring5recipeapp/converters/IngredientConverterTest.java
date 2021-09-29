@@ -19,7 +19,8 @@ class IngredientConverterTest {
 
   @Test
   void testToCommand() {
-    IngredientConverterImpl ingredientConverterImpl = new IngredientConverterImpl();
+    IngredientConverterImpl ingredientConverterImpl = new IngredientConverterImpl(
+        new UnitOfMeasureConverterImpl());
 
     UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
     unitOfMeasure.setId(123L);
@@ -81,7 +82,8 @@ class IngredientConverterTest {
 
   @Test
   void testToDomain() {
-    IngredientConverterImpl ingredientConverterImpl = new IngredientConverterImpl();
+    IngredientConverterImpl ingredientConverterImpl = new IngredientConverterImpl(
+        new UnitOfMeasureConverterImpl());
 
     UnitOfMeasureCommand unitOfMeasureCommand = new UnitOfMeasureCommand();
     unitOfMeasureCommand.setId(123L);
