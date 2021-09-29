@@ -2,7 +2,6 @@ package es.lareira.spring5recipeapp.domain;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,12 +15,18 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Recipe {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -29,11 +34,14 @@ public class Recipe {
   private String description;
   private Integer preparationTime;
   private Integer cookingTime;
+  private Integer servings;
   private String source;
   private String url;
-  @Lob private String directions;
+  @Lob
+  private String directions;
 
-  @Lob private Byte[] image;
+  @Lob
+  private Byte[] image;
 
   @Enumerated(value = EnumType.STRING)
   private Difficulty difficulty;

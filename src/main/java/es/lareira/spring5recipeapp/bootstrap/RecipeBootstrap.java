@@ -1,14 +1,5 @@
 package es.lareira.spring5recipeapp.bootstrap;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
-
 import es.lareira.spring5recipeapp.domain.Category;
 import es.lareira.spring5recipeapp.domain.Difficulty;
 import es.lareira.spring5recipeapp.domain.Ingredient;
@@ -18,7 +9,14 @@ import es.lareira.spring5recipeapp.domain.UnitOfMeasure;
 import es.lareira.spring5recipeapp.repositories.CategoryRepository;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
 import es.lareira.spring5recipeapp.repositories.UnitOfMeasureRepository;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -144,6 +142,8 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
             + "\n"
             + "\n"
             + "Read more: http://www.simplyrecipes.com/recipes/perfect_guacamole/#ixzz4jvoun5ws");
+    guacamoleRecipe.setUrl("www.simplerecipes.com/guacamole");
+    guacamoleRecipe.setServings(4);
     guacamoleNotes.setRecipe(guacamoleRecipe);
     guacamoleRecipe.setNotes(guacamoleNotes);
 
@@ -189,6 +189,9 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     tacosRecipe.setCookingTime(9);
     tacosRecipe.setPreparationTime(20);
     tacosRecipe.setDifficulty(Difficulty.MODERATE);
+    tacosRecipe.setUrl("www.simplerecipes.com/tacos");
+    tacosRecipe.setServings(4);
+    tacosRecipe.setSource("Tacos Source?");
 
     tacosRecipe.setDirections(
         "1 Prepare a gas or charcoal grill for medium-high, direct heat.\n"
