@@ -36,22 +36,42 @@
                 <th>ID</th>
                 <th>Description</th>
                 <th>Link</th>
+                <th>Update</th>
+                <th>Delete</th>
               </tr>
               </thead>
               <tr th:remove="all">
                 <td>123</td>
                 <td>Tasty Goodnes123</td>
                 <td><a>View</a></td>
+                <td><a>Update</a></td>
+                <td>
+                  <form>
+                    <button type="submit" name="delete" value="delete" class="btn-link">Delete</button>
+                  </form>
+                </td>
               </tr>
               <tr th:remove="all">
                 <td>2345</td>
                 <td>Tasty Goodnes324</td>
                 <td><a>View</a></td>
+                <td><a>Update</a></td>
+                <td>
+                  <form>
+                    <button type="submit" name="delete" value="delete" class="btn-link">Delete</button>
+                  </form>
+                </td>
               </tr>
               <tr th:each="recipe : ${recipes}">
                 <td th:text="${recipe.id}">334</td>
                 <td th:text="${recipe.description}">Tasty Goodness</td>
-                <td><a th:href="@{'/recipe/show/' + ${recipe.id}}">View</a></td>
+                <td><a th:href="@{'/recipe/' + ${recipe.id} + '/show'}">View</a></td>
+                <td><a th:href="@{'/recipe/' + ${recipe.id} + '/update'}">Update</a></td>
+                <td>
+                  <form th:action="@{'/recipe/' + ${recipe.id} + '/delete'}" method="post">
+                    <button type="submit" name="delete" value="delete" class="btn-link">Delete</button>
+                  </form>
+                </td>
               </tr>
             </table>
           </div>

@@ -1,11 +1,14 @@
 package es.lareira.spring5recipeapp.services;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import es.lareira.spring5recipeapp.commands.RecipeCommand;
 import es.lareira.spring5recipeapp.converters.IngredientConverterImpl;
 import es.lareira.spring5recipeapp.converters.NotesConverterImpl;
+import es.lareira.spring5recipeapp.converters.RecipeConverter;
 import es.lareira.spring5recipeapp.converters.RecipeConverterImpl;
 import es.lareira.spring5recipeapp.converters.UnitOfMeasureConverterImpl;
 import es.lareira.spring5recipeapp.domain.Recipe;
@@ -17,7 +20,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,14 +30,17 @@ class RecipeServiceImplTest {
 
   private RecipeServiceImpl recipeService;
 
+  private RecipeConverter recipeConverter;
+
   @Mock
   private RecipeRepository recipeRepository;
 
   @BeforeEach
   void setUp() {
-    this.recipeService = new RecipeServiceImpl(this.recipeRepository,
+    recipeConverter = Mockito.spy(
         new RecipeConverterImpl(new IngredientConverterImpl(new UnitOfMeasureConverterImpl()),
             new NotesConverterImpl()));
+    this.recipeService = new RecipeServiceImpl(this.recipeRepository, recipeConverter);
   }
 
   @Test
@@ -58,5 +66,42 @@ class RecipeServiceImplTest {
   @Test
   void findRecipeByThrowsRunTimeExceptionIfRecipeDoesNotExists() {
     Assertions.assertThrows(RuntimeException.class, () -> recipeService.findRecipeById(2L));
+  }
+
+  @Test
+  void saveRecipeCommand() {
+    RecipeCommand recipeCommand = new RecipeCommand();
+    recipeCommand.setId(5L);
+    Recipe savedRecipe = new Recipe();
+    savedRecipe.setId(7L);
+    when(recipeRepository.save(any())).thenReturn(savedRecipe);
+    RecipeCommand actual = recipeService.saveRecipeCommand(recipeCommand);
+    ArgumentCaptor<Recipe> captor = ArgumentCaptor.forClass(Recipe.class);
+    verify(recipeRepository, times(1)).save(captor.capture());
+    Assertions.assertEquals(5L, captor.getValue().getId());
+    Assertions.assertEquals(7L, actual.getId());
+    verify(recipeConverter, times(1)).toCommand(savedRecipe);
+  }
+
+  @Test
+  void findRecipeCommandById() {
+    Recipe recipe = new Recipe();
+    recipe.setId(1L);
+    recipe.setDescription("some description");
+    recipe.setSource("some source");
+    when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+    RecipeCommand actual = recipeService.findRecipeCommandById(1L);
+    Assertions.assertEquals(1L, actual.getId());
+    Assertions.assertEquals("some description", actual.getDescription());
+    Assertions.assertEquals("some source", actual.getSource());
+    verify(recipeConverter, times(1)).toCommand(recipe);
+  }
+
+  @Test
+  void deleteById() {
+    recipeService.deleteRecipeById(2L);
+    verify(recipeRepository, times(1)).deleteById(2L);
+    recipeService.deleteRecipeById(5L);
+    verify(recipeRepository, times(1)).deleteById(5L);
   }
 }
