@@ -3,12 +3,16 @@ package es.lareira.spring5recipeapp.controllers;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import es.lareira.spring5recipeapp.commands.IngredientCommand;
 import es.lareira.spring5recipeapp.domain.Recipe;
+import es.lareira.spring5recipeapp.services.IngredientService;
 import es.lareira.spring5recipeapp.services.RecipeService;
+import es.lareira.spring5recipeapp.services.UnitOfMeasurementService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,12 +29,18 @@ class IngredientControllerTest {
   private MockMvc mockMvc;
 
   @Mock
+  private IngredientService ingredientService;
+
+  @Mock
   private RecipeService recipeService;
 
+  @Mock
+  private UnitOfMeasurementService unitOfMeasurementService;
 
   @BeforeEach
   void setUp() {
-    IngredientController ingredientController = new IngredientController(recipeService);
+    IngredientController ingredientController = new IngredientController(recipeService,
+        ingredientService, unitOfMeasurementService);
     mockMvc = MockMvcBuilders.standaloneSetup(ingredientController).build();
   }
 
@@ -44,5 +54,30 @@ class IngredientControllerTest {
         .andExpect(view().name("recipe/ingredients/list"))
         .andExpect(model().attribute("recipe", expected));
     verify(recipeService, times(1)).findRecipeById(1L);
+  }
+
+  @Test
+  @SneakyThrows
+  void showIngredient() {
+    when(ingredientService.findByRecipeIdAndIngredientId(3L, 7L))
+        .thenReturn(new IngredientCommand());
+    mockMvc.perform(get("/recipe/3/ingredients/7/show"))
+        .andExpect(status().isOk())
+        .andExpect(model().attributeExists("ingredient"))
+        .andExpect(view().name("recipe/ingredients/show"));
+    verify(ingredientService).findByRecipeIdAndIngredientId(3L, 7L);
+  }
+
+  @Test
+  @SneakyThrows
+  void updateRecipeIngredient() {
+    when(ingredientService.findByRecipeIdAndIngredientId(3L, 7L))
+        .thenReturn(new IngredientCommand());
+    mockMvc.perform(get("/recipe/3/ingredients/7/update"))
+        .andExpect(status().isOk())
+        .andExpect(model().attributeExists("ingredient"))
+        .andExpect(model().attributeExists("uomList"))
+        .andExpect(view().name("recipe/ingredients/updateForm"));
+    verify(ingredientService).findByRecipeIdAndIngredientId(3L, 7L);
   }
 }

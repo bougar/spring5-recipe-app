@@ -13,6 +13,7 @@ import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.domain.UnitOfMeasure;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class IngredientConverterTest {
@@ -78,6 +79,7 @@ class IngredientConverterTest {
     assertEquals("The characteristics of someone or something", unitOfMeasure1.getDescription());
     assertEquals(123L, unitOfMeasure1.getId().longValue());
     assertEquals("42", amount.toString());
+    assertEquals(123L, actualToCommandResult.getRecipeId());
   }
 
   @Test
@@ -91,6 +93,7 @@ class IngredientConverterTest {
 
     IngredientCommand ingredientCommand = new IngredientCommand();
     ingredientCommand.setAmount(BigDecimal.valueOf(42L));
+    ingredientCommand.setRecipeId(5L);
     ingredientCommand.setId(123L);
     ingredientCommand.setUnitOfMeasure(unitOfMeasureCommand);
     ingredientCommand.setDescription("The characteristics of someone or something");
@@ -106,6 +109,7 @@ class IngredientConverterTest {
     assertEquals(123L, unitOfMeasure.getId().longValue());
     assertEquals("The characteristics of someone or something", unitOfMeasure.getDescription());
     assertEquals("42", actualToDomainResult.getAmount().toString());
+    Assertions.assertEquals(5L, actualToDomainResult.getRecipe().getId());
   }
 }
 
