@@ -9,16 +9,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-@Data
-@EqualsAndHashCode(exclude = {"recipe"})
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Builder
 @ToString(exclude = {"recipe"})
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Ingredient {

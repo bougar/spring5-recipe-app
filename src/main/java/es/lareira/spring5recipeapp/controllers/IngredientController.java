@@ -1,11 +1,14 @@
 package es.lareira.spring5recipeapp.controllers;
 
 import es.lareira.spring5recipeapp.commands.IngredientCommand;
+import es.lareira.spring5recipeapp.commands.RecipeCommand;
+import es.lareira.spring5recipeapp.commands.UnitOfMeasureCommand;
 import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.domain.UnitOfMeasure;
 import es.lareira.spring5recipeapp.services.IngredientService;
 import es.lareira.spring5recipeapp.services.RecipeService;
 import es.lareira.spring5recipeapp.services.UnitOfMeasurementService;
+import java.text.MessageFormat;
 import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,11 +51,26 @@ public class IngredientController {
     return "recipe/ingredients/updateForm";
   }
 
+  @RequestMapping("/recipe/{recipeId}/ingredients/new")
+  public String newRecipeIngredient(@PathVariable String recipeId, Model model) {
+    RecipeCommand recipeCommandById = recipeService.findRecipeCommandById(Long.valueOf(recipeId));
+    assert recipeCommandById != null;
+    List<UnitOfMeasure> unitOfMeasureList = unitOfMeasurementService.findAll();
+    model.addAttribute("uomList", unitOfMeasureList);
+    IngredientCommand ingredientCommand = new IngredientCommand();
+    ingredientCommand.setRecipeId(Long.valueOf(recipeId));
+    ingredientCommand.setUnitOfMeasure(new UnitOfMeasureCommand());
+    model.addAttribute("ingredient", ingredientCommand);
+    return "recipe/ingredients/updateForm";
+  }
+
   @PostMapping("/recipe/{recipeId}/ingredients")
   public String saveIngredient(@ModelAttribute IngredientCommand ingredientCommand) {
     Long recipeId = ingredientCommand.getRecipeId();
-    this.ingredientService.saveIngredientCommand(ingredientCommand);
-    return "redirect:/recipe/" + recipeId + "/ingredients/" + ingredientCommand.getId() + "/show";
+    IngredientCommand savedIngredientCommand = this.ingredientService
+        .saveIngredientCommand(ingredientCommand);
+    return MessageFormat.format("redirect:/recipe/{0}/ingredients/{1}/show", recipeId,
+        savedIngredientCommand.getId());
   }
 
   @RequestMapping({"/recipe/{recipeId}/ingredients/{ingredientId}/show",
@@ -63,5 +81,11 @@ public class IngredientController {
         Long.valueOf(recipeId), Long.valueOf(ingredientId));
     model.addAttribute("ingredient", ingredientCommand);
     return "recipe/ingredients/show";
+  }
+
+  @PostMapping("/recipe/{recipeId}/ingredients/{ingredientId}/delete")
+  public String deleteIngredient(@PathVariable String recipeId, @PathVariable String ingredientId) {
+    this.ingredientService.deleteIngredient(Long.valueOf(recipeId), Long.valueOf(ingredientId));
+    return MessageFormat.format("redirect:/recipe/{0}/ingredients", recipeId);
   }
 }

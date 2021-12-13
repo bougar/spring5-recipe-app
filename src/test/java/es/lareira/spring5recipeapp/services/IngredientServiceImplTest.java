@@ -7,16 +7,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import es.lareira.spring5recipeapp.commands.IngredientCommand;
-import es.lareira.spring5recipeapp.commands.UnitOfMeasureCommand;
 import es.lareira.spring5recipeapp.converters.IngredientConverter;
 import es.lareira.spring5recipeapp.converters.IngredientConverterImpl;
 import es.lareira.spring5recipeapp.converters.UnitOfMeasureConverter;
 import es.lareira.spring5recipeapp.converters.UnitOfMeasureConverterImpl;
 import es.lareira.spring5recipeapp.domain.Ingredient;
 import es.lareira.spring5recipeapp.domain.Recipe;
-import es.lareira.spring5recipeapp.domain.UnitOfMeasure;
+import es.lareira.spring5recipeapp.repositories.IngredientRepository;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
-import es.lareira.spring5recipeapp.repositories.UnitOfMeasureRepository;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
@@ -39,7 +37,7 @@ class IngredientServiceImplTest {
   private RecipeRepository recipeRepository;
 
   @Mock
-  private UnitOfMeasureRepository unitOfMeasureRepository;
+  private IngredientRepository ingredientRepository;
 
   private IngredientConverter ingredientConverter;
 
@@ -49,7 +47,7 @@ class IngredientServiceImplTest {
     UnitOfMeasureConverter unitOfMeasureConverter = new UnitOfMeasureConverterImpl();
     ingredientConverter = Mockito.spy(new IngredientConverterImpl(unitOfMeasureConverter));
     ingredientService = new IngredientServiceImpl(recipeRepository, ingredientConverter,
-        unitOfMeasureRepository);
+        ingredientRepository);
   }
 
 
@@ -108,47 +106,42 @@ class IngredientServiceImplTest {
     ingredientCommand.setDescription(description);
     Recipe recipe = Mockito.spy(new Recipe());
     recipe.setId(recipeId);
+
     when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
-    when(recipeRepository.save(any())).thenReturn(recipe);
-    this.ingredientService.saveIngredientCommand(ingredientCommand);
-    verify(ingredientConverter, times(1)).toDomain(ingredientCommand);
-    ArgumentCaptor<Ingredient> ingredientCaptor = ArgumentCaptor.forClass(Ingredient.class);
-    verify(recipe, times(1)).addIngredient(ingredientCaptor.capture());
-    Assertions.assertEquals(ingredientId, ingredientCaptor.getValue().getId());
-    verify(recipeRepository, times(1)).save(recipe);
+    Ingredient savedIngredient = Ingredient.builder()
+        .id(ingredientId)
+        .recipe(recipe)
+        .description(description)
+        .build();
+    when(ingredientRepository.save(any())).thenReturn(savedIngredient);
+    IngredientCommand actual = ingredientService.saveIngredientCommand(ingredientCommand);
+    ArgumentCaptor<Ingredient> ingredientArgumentCaptor = ArgumentCaptor.forClass(Ingredient.class);
+    verify(ingredientRepository).save(ingredientArgumentCaptor.capture());
+    Assertions.assertEquals(recipe, ingredientArgumentCaptor.getValue().getRecipe());
+    Assertions.assertEquals(recipeId, actual.getRecipeId());
+    Assertions.assertEquals(ingredientId, actual.getId());
+    Assertions.assertEquals(description, actual.getDescription());
   }
 
   @ParameterizedTest
-  @CsvSource({
-      "1, 2, 3, description",
-      "3, 4, 5, description2"
-  })
-  void saveIngredientCommandWhenIngredientExist(Long ingredientId, Long recipeId, Long uomId,
-      String description) {
-    IngredientCommand ingredientCommand = new IngredientCommand();
-    ingredientCommand.setId(ingredientId);
-    ingredientCommand.setRecipeId(recipeId);
-    ingredientCommand.setDescription(description);
-    UnitOfMeasureCommand unitOfMeasureCommand = new UnitOfMeasureCommand();
-    unitOfMeasureCommand.setId(uomId);
-    ingredientCommand.setUnitOfMeasure(unitOfMeasureCommand);
-    when(unitOfMeasureRepository.findById(uomId)).thenReturn(Optional.of(new UnitOfMeasure()));
-    Recipe recipe = Mockito.spy(new Recipe());
-    recipe.setId(recipeId);
-    Ingredient ingredient = Mockito.spy(Ingredient.builder()
+  @CsvSource({"5,6", "8,14", "9,433"})
+  void deleteIngredient(Long recipeId, Long ingredientId) {
+    Ingredient ingredient1 = Ingredient.builder()
         .id(ingredientId)
-        .build());
-    recipe.addIngredient(ingredient);
-    when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
-    when(recipeRepository.save(any())).thenReturn(recipe);
-    this.ingredientService.saveIngredientCommand(ingredientCommand);
-    verify(ingredientConverter, times(1)).toCommand(any());
-    ArgumentCaptor<Ingredient> ingredientCaptor = ArgumentCaptor.forClass(Ingredient.class);
-    verify(recipe, times(1)).addIngredient(ingredientCaptor.capture());
-    Assertions.assertEquals(ingredientId, ingredientCaptor.getValue().getId());
-    verify(recipeRepository, times(1)).save(recipe);
-    verify(ingredient, times(1)).setUnitOfMeasure(any());
-    verify(ingredient, times(1)).setDescription(any());
-    verify(ingredient, times(1)).setAmount(any());
+        .build();
+    Ingredient ingredient2 = Ingredient.builder()
+        .id(ingredientId + 1)
+        .build();
+    Recipe recipe = Recipe.builder()
+        .id(recipeId)
+        .ingredients(Set.of(ingredient1, ingredient2))
+        .build();
+    when(this.recipeRepository.findById(recipeId))
+        .thenReturn(Optional.of(recipe));
+    this.ingredientService.deleteIngredient(recipeId, ingredientId);
+    verify(this.recipeRepository, times(1)).findById(recipeId);
+    verify(this.recipeRepository, times(1)).save(recipe);
+    Assertions.assertEquals(1, recipe.getIngredients().size());
+    Assertions.assertTrue(recipe.getIngredients().contains(ingredient2));
   }
 }

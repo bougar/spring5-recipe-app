@@ -17,13 +17,18 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.ToString.Exclude;
 
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class Recipe {
 
@@ -47,6 +52,7 @@ public class Recipe {
   private Difficulty difficulty;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
+  @Exclude
   private Set<Ingredient> ingredients = new HashSet<>();
 
   @OneToOne(cascade = CascadeType.ALL)
@@ -57,6 +63,7 @@ public class Recipe {
       name = "recipe_category",
       joinColumns = @JoinColumn(name = "recipe_id"),
       inverseJoinColumns = @JoinColumn(name = "category_id"))
+  @Exclude
   private Set<Category> categories = new HashSet<>();
 
   public Recipe addIngredient(final Ingredient ingredient) {

@@ -4,9 +4,9 @@ import es.lareira.spring5recipeapp.commands.IngredientCommand;
 import es.lareira.spring5recipeapp.converters.IngredientConverter;
 import es.lareira.spring5recipeapp.domain.Ingredient;
 import es.lareira.spring5recipeapp.domain.Recipe;
-import es.lareira.spring5recipeapp.domain.UnitOfMeasure;
+import es.lareira.spring5recipeapp.repositories.IngredientRepository;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
-import es.lareira.spring5recipeapp.repositories.UnitOfMeasureRepository;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -20,15 +20,15 @@ public class IngredientServiceImpl implements IngredientService {
 
   private final IngredientConverter ingredientConverter;
 
-  private final UnitOfMeasureRepository unitOfMeasureRepository;
+  private final IngredientRepository ingredientRepository;
 
   public IngredientServiceImpl(
       RecipeRepository recipeRepository,
       IngredientConverter ingredientConverter,
-      UnitOfMeasureRepository unitOfMeasureRepository) {
+      IngredientRepository ingredientRepository) {
     this.recipeRepository = recipeRepository;
     this.ingredientConverter = ingredientConverter;
-    this.unitOfMeasureRepository = unitOfMeasureRepository;
+    this.ingredientRepository = ingredientRepository;
   }
 
   private Optional<Ingredient> findIngredientById(Set<Ingredient> ingredients, Long ingredientId) {
@@ -56,31 +56,22 @@ public class IngredientServiceImpl implements IngredientService {
   @Override
   public IngredientCommand saveIngredientCommand(IngredientCommand ingredientCommand) {
     Optional<Recipe> recipeOptional = recipeRepository.findById(ingredientCommand.getRecipeId());
-    if (recipeOptional.isEmpty()) {
-      log.error("Recipe with id [{}] not found", ingredientCommand.getRecipeId());
-      return new IngredientCommand();
-    }
-    Recipe recipe = recipeOptional.get();
-    Optional<Ingredient> optionalIngredient = recipe.getIngredients()
-        .stream()
-        .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
-        .findFirst();
-    if (optionalIngredient.isPresent()) {
-      Ingredient ingredient = optionalIngredient.get();
-      ingredient.setDescription(ingredientCommand.getDescription());
-      ingredient.setAmount(ingredientCommand.getAmount());
-      UnitOfMeasure unitOfMeasure = this.unitOfMeasureRepository.findById(
-              ingredientCommand.getUnitOfMeasure().getId())
-          .orElseThrow(() -> new RuntimeException("UOM NOT FOUND"));
-      ingredient.setUnitOfMeasure(unitOfMeasure);
-    } else {
-      recipe.addIngredient(ingredientConverter.toDomain(ingredientCommand));
-    }
-    Recipe savedRecipe = this.recipeRepository.save(recipe);
-    Ingredient savedIngredient = savedRecipe.getIngredients().stream()
-        .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
-        .findFirst()
-        .orElseThrow(() -> new RuntimeException("Ingredient Not Found"));
+    Recipe recipe = recipeOptional.orElseThrow(() -> new RuntimeException("Recipe Not Found"));
+    Ingredient ingredient = ingredientConverter.toDomain(ingredientCommand);
+    ingredient.setRecipe(recipe);
+    Ingredient savedIngredient = ingredientRepository.save(ingredient);
+    recipe.addIngredient(savedIngredient);
+    recipeRepository.save(recipe);
     return ingredientConverter.toCommand(savedIngredient);
+  }
+
+  @Override
+  public void deleteIngredient(Long recipeId, Long ingredientId) {
+    Optional<Recipe> optionalRecipe = this.recipeRepository.findById(recipeId);
+    Recipe recipe = optionalRecipe.orElseThrow(() -> new RuntimeException("Recipe does not exist"));
+    HashSet<Ingredient> ingredients = new HashSet<>(recipe.getIngredients());
+    ingredients.removeIf(ingredient -> ingredient.getId().equals(ingredientId));
+    recipe.setIngredients(ingredients);
+    ingredientRepository.deleteById(ingredientId);
   }
 }

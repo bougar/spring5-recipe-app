@@ -8,14 +8,17 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.ToString.Exclude;
 
-@Data
-@EqualsAndHashCode(exclude = {"recipes"})
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Category {
@@ -27,5 +30,6 @@ public class Category {
   private String description;
 
   @ManyToMany(mappedBy = "categories")
+  @Exclude
   private Set<Recipe> recipes;
 }
