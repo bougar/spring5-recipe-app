@@ -65,7 +65,13 @@
                 </div>
                 <div class="col-md-3 form-group">
                   <label>Difficulty:</label>
-                  <select class="form-control">
+                  <select class="form-control" th:field="*{difficulty}">
+                    <option th:each="difficulty : ${T(es.lareira.spring5recipeapp.domain.Difficulty).values()}"
+                            th:value="${difficulty.name()}"
+                            th:text="${difficulty.name()}">
+                    </option>
+                  </select>
+                  <select class="form-control" th:remove="all">
                     <option>Easy</option>
                     <option>Medium</option>
                     <option>Hard</option>
