@@ -99,11 +99,6 @@ class RecipeConverterTest {
     recipeCommand.setPreparationTime(1);
     Recipe actualToDomainResult = recipeConverterImpl.toDomain(recipeCommand);
     assertTrue(actualToDomainResult.getCategories().isEmpty());
-    assertEquals(
-        "Recipe(id=123, description=The characteristics of someone or something, preparationTime=1, cookingTime=1,"
-            + " servings=1, source=Source, url=https://example.org/example, directions=Directions, image=null,"
-            + " difficulty=EASY, ingredients=[], notes=Notes(id=123, recipeNotes=Recipe Notes), categories=[])",
-        actualToDomainResult.toString());
     assertEquals("https://example.org/example", actualToDomainResult.getUrl());
     assertEquals("Source", actualToDomainResult.getSource());
     assertEquals(1, actualToDomainResult.getServings().intValue());

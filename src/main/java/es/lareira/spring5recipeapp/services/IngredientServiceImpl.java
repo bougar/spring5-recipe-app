@@ -68,10 +68,12 @@ public class IngredientServiceImpl implements IngredientService {
   @Override
   public void deleteIngredient(Long recipeId, Long ingredientId) {
     Optional<Recipe> optionalRecipe = this.recipeRepository.findById(recipeId);
-    Recipe recipe = optionalRecipe.orElseThrow(() -> new RuntimeException("Recipe does not exist"));
+    Recipe recipe = optionalRecipe.orElseThrow(() -> new RuntimeException("RECIPE NOT FOUND!!!"));
     HashSet<Ingredient> ingredients = new HashSet<>(recipe.getIngredients());
     ingredients.removeIf(ingredient -> ingredient.getId().equals(ingredientId));
     recipe.setIngredients(ingredients);
+    recipeRepository.save(recipe);
     ingredientRepository.deleteById(ingredientId);
+
   }
 }

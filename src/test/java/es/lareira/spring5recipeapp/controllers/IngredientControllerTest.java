@@ -104,7 +104,8 @@ class IngredientControllerTest {
   void deleteIngredient(String recipeId, String ingredientId) {
     mockMvc.perform(post("/recipe/" + recipeId + "/ingredients/" + ingredientId + "/delete"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(MockMvcResultMatchers.view().name("redirect:/recipe/" + recipeId));
+        .andExpect(
+            MockMvcResultMatchers.view().name("redirect:/recipe/" + recipeId + "/ingredients"));
     verify(ingredientService, times(1))
         .deleteIngredient(Long.valueOf(recipeId), Long.valueOf(ingredientId));
   }
