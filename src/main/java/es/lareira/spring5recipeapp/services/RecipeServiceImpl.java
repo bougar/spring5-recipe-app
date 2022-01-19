@@ -3,6 +3,7 @@ package es.lareira.spring5recipeapp.services;
 import es.lareira.spring5recipeapp.commands.RecipeCommand;
 import es.lareira.spring5recipeapp.converters.RecipeConverter;
 import es.lareira.spring5recipeapp.domain.Recipe;
+import es.lareira.spring5recipeapp.exceptions.NotFoundException;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
 import java.util.HashSet;
 import java.util.Optional;
@@ -33,8 +34,8 @@ public class RecipeServiceImpl implements RecipeService {
   @Override
   public Recipe findRecipeById(Long id) {
     Optional<Recipe> recipe = recipeRepository.findById(id);
-
-    return recipe.orElseThrow(() -> new RuntimeException("Recipe does not exist!"));
+    return recipe.orElseThrow(
+        () -> new NotFoundException("Recipe Not Found for Id value: " + id));
   }
 
   @Override

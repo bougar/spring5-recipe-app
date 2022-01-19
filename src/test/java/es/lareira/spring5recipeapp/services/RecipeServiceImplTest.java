@@ -1,5 +1,6 @@
 package es.lareira.spring5recipeapp.services;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import es.lareira.spring5recipeapp.converters.RecipeConverter;
 import es.lareira.spring5recipeapp.converters.RecipeConverterImpl;
 import es.lareira.spring5recipeapp.converters.UnitOfMeasureConverterImpl;
 import es.lareira.spring5recipeapp.domain.Recipe;
+import es.lareira.spring5recipeapp.exceptions.NotFoundException;
 import es.lareira.spring5recipeapp.repositories.RecipeRepository;
 import java.util.Collections;
 import java.util.Optional;
@@ -20,6 +22,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -65,7 +69,7 @@ class RecipeServiceImplTest {
 
   @Test
   void findRecipeByThrowsRunTimeExceptionIfRecipeDoesNotExists() {
-    Assertions.assertThrows(RuntimeException.class, () -> recipeService.findRecipeById(2L));
+    assertThrows(RuntimeException.class, () -> recipeService.findRecipeById(2L));
   }
 
   @Test
@@ -95,6 +99,13 @@ class RecipeServiceImplTest {
     Assertions.assertEquals("some description", actual.getDescription());
     Assertions.assertEquals("some source", actual.getSource());
     verify(recipeConverter, times(1)).toCommand(recipe);
+  }
+
+  @ParameterizedTest
+  @ValueSource(longs = {1, 2, 434, 43434})
+  void findRecipeByIdNotFound(Long id) {
+    when(recipeRepository.findById(id)).thenReturn(Optional.empty());
+    assertThrows(NotFoundException.class, () -> this.recipeService.findRecipeById(id));
   }
 
   @Test

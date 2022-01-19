@@ -4,15 +4,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import es.lareira.spring5recipeapp.commands.RecipeCommand;
 import es.lareira.spring5recipeapp.domain.Recipe;
+import es.lareira.spring5recipeapp.exceptions.NotFoundException;
 import es.lareira.spring5recipeapp.services.RecipeService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,7 +49,18 @@ class RecipesControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.get("/recipe/1/show"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.model().attribute("recipe", expected))
-        .andExpect(MockMvcResultMatchers.view().name("recipe/show"));
+        .andExpect(view().name("recipe/show"));
+  }
+
+  @ParameterizedTest
+  @SneakyThrows
+  @ValueSource(longs = {1, 2, 434, 5344})
+  void showRecipeWhenNotFound(Long recipeId) {
+    when(recipeService.findRecipeById(recipeId))
+        .thenThrow(new NotFoundException("Recipe Not Found"));
+    mockMvc.perform(MockMvcRequestBuilders.get("/recipe/" + recipeId + "/show"))
+        .andExpect(MockMvcResultMatchers.status().isNotFound())
+        .andExpect(view().name("NotFoundPage"));
   }
 
   @SneakyThrows
@@ -54,7 +69,7 @@ class RecipesControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.get("/recipe/new"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.model().attributeExists("recipe"))
-        .andExpect(MockMvcResultMatchers.view().name("recipe/recipeform"));
+        .andExpect(view().name("recipe/recipeform"));
   }
 
   @SneakyThrows
@@ -69,7 +84,7 @@ class RecipesControllerTest {
             .param("description", "some description")
         )
         .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-        .andExpect(MockMvcResultMatchers.view().name("redirect:/recipe/3/show"));
+        .andExpect(view().name("redirect:/recipe/3/show"));
     ArgumentCaptor<RecipeCommand> captor = ArgumentCaptor.forClass(RecipeCommand.class);
     verify(recipeService, times(1)).saveRecipeCommand(captor.capture());
     Assertions.assertEquals(3L, captor.getValue().getId());
@@ -83,7 +98,7 @@ class RecipesControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.get("/recipe/7/update"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.model().attributeExists("recipe"))
-        .andExpect(MockMvcResultMatchers.view().name("recipe/recipeform"));
+        .andExpect(view().name("recipe/recipeform"));
     verify(recipeService, times(1)).findRecipeCommandById(7L);
   }
 
@@ -92,7 +107,7 @@ class RecipesControllerTest {
   void deleteRecipe() {
     mockMvc.perform(MockMvcRequestBuilders.post("/recipe/1/delete"))
         .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-        .andExpect(MockMvcResultMatchers.view().name("redirect:/"));
+        .andExpect(view().name("redirect:/"));
     verify(recipeService, times(1)).deleteRecipeById(1L);
   }
 }

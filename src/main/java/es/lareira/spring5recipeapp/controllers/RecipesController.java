@@ -3,6 +3,7 @@ package es.lareira.spring5recipeapp.controllers;
 import es.lareira.spring5recipeapp.commands.RecipeCommand;
 import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.services.RecipeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@Slf4j
 public class RecipesController {
 
   private final RecipeService recipeService;
@@ -52,5 +54,4 @@ public class RecipesController {
     recipeService.deleteRecipeById(id);
     return "redirect:/";
   }
-
 }
