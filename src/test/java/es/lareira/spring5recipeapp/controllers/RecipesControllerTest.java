@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import es.lareira.spring5recipeapp.commands.RecipeCommand;
 import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.exceptions.NotFoundException;
+import es.lareira.spring5recipeapp.exceptions.handlers.MethodArgumentTypeMismatchExceptionHandler;
+import es.lareira.spring5recipeapp.exceptions.handlers.NotFoundExceptionHandler;
 import es.lareira.spring5recipeapp.services.RecipeService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -37,7 +39,11 @@ class RecipesControllerTest {
   @BeforeEach
   public void setUp() {
     RecipesController recipesController = new RecipesController(recipeService);
-    mockMvc = MockMvcBuilders.standaloneSetup(recipesController).build();
+    mockMvc = MockMvcBuilders.standaloneSetup(recipesController)
+        .setControllerAdvice(
+            new MethodArgumentTypeMismatchExceptionHandler(),
+            new NotFoundExceptionHandler())
+        .build();
   }
 
   @SneakyThrows
@@ -60,7 +66,7 @@ class RecipesControllerTest {
         .thenThrow(new NotFoundException("Recipe Not Found"));
     mockMvc.perform(MockMvcRequestBuilders.get("/recipe/" + recipeId + "/show"))
         .andExpect(MockMvcResultMatchers.status().isNotFound())
-        .andExpect(view().name("NotFoundPage"));
+        .andExpect(view().name("errorPage"));
   }
 
   @SneakyThrows
@@ -82,6 +88,7 @@ class RecipesControllerTest {
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .param("id", "3")
             .param("description", "some description")
+            .param("directions", "test")
         )
         .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
         .andExpect(view().name("redirect:/recipe/3/show"));

@@ -3,9 +3,11 @@ package es.lareira.spring5recipeapp.controllers;
 import es.lareira.spring5recipeapp.commands.RecipeCommand;
 import es.lareira.spring5recipeapp.domain.Recipe;
 import es.lareira.spring5recipeapp.services.RecipeService;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +39,11 @@ public class RecipesController {
   }
 
   @PostMapping("recipe")
-  public String saveOrUpdate(@ModelAttribute RecipeCommand recipeCommand) {
+  public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand recipeCommand,
+      BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      return "recipe/recipeform";
+    }
     RecipeCommand saveRecipeCommand = recipeService.saveRecipeCommand(recipeCommand);
     return "redirect:/recipe/" + saveRecipeCommand.getId() + "/show";
   }
