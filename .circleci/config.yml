@@ -15,8 +15,6 @@ jobs:
         
       - run: mvn verify
         
-      - run: mvn cobertura:cobertura
-
       - run:
           name: Code Coverage
           command: bash <(curl -s https://codecov.io/bash)
