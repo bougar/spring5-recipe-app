@@ -18,5 +18,3 @@ jobs:
       - run:
           name: Code Coverage
           command: bash <(curl -s https://codecov.io/bash)
-          environment:
-            CODECOV_TOKEN: $CODECOV_TOKEN
